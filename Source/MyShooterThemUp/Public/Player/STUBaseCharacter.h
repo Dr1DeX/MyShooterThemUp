@@ -7,6 +7,7 @@
 #include "STUBaseCharacter.generated.h"
 
 class UCameraComponent;
+class USpringArmComponent;
 
 UCLASS()
 class MYSHOOTERTHEMUP_API ASTUBaseCharacter : public ACharacter
@@ -19,6 +20,9 @@ public:
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Componets")
+    USpringArmComponent* SpringArmComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Componets")
     UCameraComponent* CameraComponent;
 
     // Called when the game starts or when spawned
@@ -30,4 +34,8 @@ public:
 
     // Called to bind functionality to input
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+private:
+    void MoveForwarder(float Amount);
+    void MoveRighter(float Amount);
 };
