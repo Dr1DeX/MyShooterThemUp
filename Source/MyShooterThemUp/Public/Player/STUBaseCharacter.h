@@ -8,6 +8,8 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class USTUHealthComponent;
+class UTextRenderComponent;
 
 UCLASS()
 class MYSHOOTERTHEMUP_API ASTUBaseCharacter : public ACharacter
@@ -25,14 +27,17 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Componets")
     UCameraComponent* CameraComponent;
 
-    // Called when the game starts or when spawned
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Componets")
+    USTUHealthComponent* HealthComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Componets")
+    UTextRenderComponent* HealthTextComponent;
+
     virtual void BeginPlay() override;
 
 public:
-    // Called every frame
     virtual void Tick(float DeltaTime) override;
 
-    // Called to bind functionality to input
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
     UFUNCTION(BlueprintCallable, category = "Movement")
