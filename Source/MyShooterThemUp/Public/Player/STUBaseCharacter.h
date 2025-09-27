@@ -35,6 +35,9 @@ protected:
 
     virtual void BeginPlay() override;
 
+    UPROPERTY(EditDefaultsOnly, Category = "Animation")
+    UAnimMontage* DeathAnimMontage;
+
 public:
     virtual void Tick(float DeltaTime) override;
 
@@ -55,4 +58,6 @@ private:
 
     void OnStartRun();
     void OnStopRun();
+    void OnDeath();
+    void OnHealthChanged(float Health);
 };
