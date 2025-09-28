@@ -36,6 +36,58 @@ void USTUHealthComponent::OnTakeAnyDamage(
 
     if (IsDead())
     {
+        StopAutoHeal();
         OnDeath.Broadcast();
+        return;
+    }
+
+    StopAutoHeal();
+    if (bAutoHeal)
+    {
+        StartAutoHeal();
+    }
+}
+
+void USTUHealthComponent::HealTick()
+{
+    if (IsDead())
+    {
+        StopAutoHeal();
+        return;
+    }
+
+    const float Amount = HealModifier;
+
+    const float OldHealth = Health;
+
+    Health = FMath::Clamp(Health + Amount, 0.0f, MaxHealth);
+
+    if (!FMath::IsNearlyEqual(Health, OldHealth))
+    {
+        OnHealthChanged.Broadcast(Health);
+    }
+
+    if (FMath::IsNearlyEqual(Health, MaxHealth))
+    {
+        StopAutoHeal();
+    }
+}
+
+void USTUHealthComponent::StartAutoHeal()
+{
+    if (!bAutoHeal || IsDead() || Health >= MaxHealth)
+        return;
+
+    if (UWorld* World = GetWorld())
+    {
+        World->GetTimerManager().SetTimer(HealTimerHandle, this, &USTUHealthComponent::HealTick, HealUpdateTime, true, HealDelay);
+    }
+}
+
+void USTUHealthComponent::StopAutoHeal()
+{
+    if (UWorld* World = GetWorld())
+    {
+        World->GetTimerManager().ClearTimer(HealTimerHandle);
     }
 }
