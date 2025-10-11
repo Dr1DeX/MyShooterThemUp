@@ -10,7 +10,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class USTUHealthComponent;
 class UTextRenderComponent;
-class ASTUBaseWeaponActor;
+class USTUWeaponComponent;
 
 UCLASS()
 class MYSHOOTERTHEMUP_API ASTUBaseCharacter : public ACharacter
@@ -34,6 +34,9 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Componets")
     UTextRenderComponent* HealthTextComponent;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Componets")
+    USTUWeaponComponent* WeaponComponent;
+
     virtual void BeginPlay() override;
 
     UPROPERTY(EditDefaultsOnly, Category = "Animation")
@@ -44,9 +47,6 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, Category = "Movement")
     FVector2D LandedDamage = FVector2D(10.0f, 100.0f);
-
-    UPROPERTY(EditDefaultsOnly, Category = "Movement")
-    TSubclassOf<ASTUBaseWeaponActor> WeaponClass;
 
 public:
     virtual void Tick(float DeltaTime) override;
@@ -73,6 +73,4 @@ private:
 
     UFUNCTION()
     void OnGroundLanded(const FHitResult& Hit);
-
-    void SpawnWeapon();
 };
