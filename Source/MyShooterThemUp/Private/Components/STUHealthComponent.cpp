@@ -31,21 +31,7 @@ void USTUHealthComponent::OnTakeAnyDamage(
     if (Damage <= 0.0f || IsDead())
         return;
 
-    Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
-    OnHealthChanged.Broadcast(Health);
-
-    if (IsDead())
-    {
-        StopAutoHeal();
-        OnDeath.Broadcast();
-        return;
-    }
-
-    StopAutoHeal();
-    if (bAutoHeal)
-    {
-        StartAutoHeal();
-    }
+    ApplyDamage(Damage, InstigatedBy);
 }
 
 void USTUHealthComponent::HealTick()
@@ -89,5 +75,32 @@ void USTUHealthComponent::StopAutoHeal()
     if (UWorld* World = GetWorld())
     {
         World->GetTimerManager().ClearTimer(HealTimerHandle);
+    }
+}
+
+void USTUHealthComponent::ApplyDamage(float Damage, AController*)
+{
+    if (Damage <= 0.f || IsDead())
+        return;
+
+    const float OldHealth = Health;
+    Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+
+    if (!FMath::IsNearlyEqual(Health, OldHealth))
+    {
+        OnHealthChanged.Broadcast(Health);
+    }
+
+    if (IsDead())
+    {
+        StopAutoHeal();
+        OnDeath.Broadcast();
+        return;
+    }
+
+    StopAutoHeal();
+    if (bAutoHeal)
+    {
+        StartAutoHeal();
     }
 }

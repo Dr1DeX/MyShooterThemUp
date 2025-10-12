@@ -28,6 +28,15 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
     float TraceMaxDistance = 1500.0f;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components | Weapon |Damage")
+    float BaseDamage = 25.0f;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components | Weapon |Damage")
+    float HeadshotMultiplier = 2.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components | Weapon |Damage")
+    TSubclassOf<UDamageType> DamageType = UDamageType::StaticClass();
+
     virtual void BeginPlay() override;
 
     void MakeShot();
@@ -38,4 +47,6 @@ protected:
     bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
 
     void MakeHit(UWorld* World, const FVector& AimPoint);
+
+    void MakeDamage(FHitResult ShotHit, FVector DirFromMuzzle);
 };
