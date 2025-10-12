@@ -37,53 +37,73 @@ void ASTUBaseWeaponActor::MakeShot()
     if (!World)
         return;
 
-    const auto OwnerCharacter = Cast<ACharacter>(GetOwner());
-
-    if (!OwnerCharacter)
+    FVector CameraStart, CameraEnd;
+    if (!GetTraceData(CameraStart, CameraEnd))
         return;
-
-    const auto PC = OwnerCharacter->GetController<APlayerController>();
-
-    if (!PC)
-        return;
-
-    FVector ViewLocation;
-    FRotator ViewRotation;
-    PC->GetPlayerViewPoint(ViewLocation, ViewRotation);
-
-    const FTransform MuzzleTM = WeaponMesh->GetSocketTransform(MuzzleSocketName);
-    const FVector MuzzleLocation = MuzzleTM.GetLocation();
-    const FVector MuzzleForward = MuzzleTM.GetRotation().GetForwardVector();
-
-    const FVector CameraTraceStart = ViewLocation;
-    const FVector CameraTraceEnd = CameraTraceStart + ViewRotation.Vector() * TraceMaxDistance;
 
     FCollisionQueryParams CameraParams(SCENE_QUERY_STAT(Weapon_AimTrace), false);
+    CameraParams.AddIgnoredActor(GetOwner());
     CameraParams.AddIgnoredActor(this);
-    CameraParams.AddIgnoredActor(OwnerCharacter);
 
-    FHitResult AimHit;
-    World->LineTraceSingleByChannel(AimHit, CameraTraceStart, CameraTraceEnd, ECollisionChannel::ECC_Visibility);
+    FHitResult CameraHit;
+    World->LineTraceSingleByChannel(CameraHit, CameraStart, CameraEnd, ECollisionChannel::ECC_Visibility, CameraParams);
+    const FVector AimPoint = CameraHit.bBlockingHit ? CameraHit.ImpactPoint : CameraEnd;
 
-    const FVector AimPoint = AimHit.bBlockingHit ? AimHit.ImpactPoint : CameraTraceEnd;
+    MakeHit(World, AimPoint);
+}
 
-    FVector DirFromMuzzle = AimPoint - MuzzleLocation;
+APlayerController* ASTUBaseWeaponActor::GetPlayerController() const
+{
+    const auto Player = Cast<ACharacter>(GetOwner());
+    if (!Player)
+        return nullptr;
+
+    return Player->GetController<APlayerController>();
+}
+
+bool ASTUBaseWeaponActor::GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const
+{
+    const auto PC = GetPlayerController();
+    if (!PC)
+        return false;
+
+    PC->GetPlayerViewPoint(ViewLocation, ViewRotation);
+    return true;
+}
+
+bool ASTUBaseWeaponActor::GetTraceData(FVector& CameraTraceStart, FVector& CameraTraceEnd) const
+{
+    FVector ViewLocation;
+    FRotator ViewRotation;
+    if (!GetPlayerViewPoint(ViewLocation, ViewRotation))
+        return false;
+
+    CameraTraceStart = ViewLocation;
+    CameraTraceEnd = CameraTraceStart + ViewRotation.Vector() * TraceMaxDistance;
+    return true;
+}
+
+void ASTUBaseWeaponActor::MakeHit(UWorld* World, const FVector& AimPoint)
+{
+    const FTransform MuzzleTM = WeaponMesh->GetSocketTransform(MuzzleSocketName);
+    const FVector MuzzleLoc = MuzzleTM.GetLocation();
+    const FVector MuzzleFwd = MuzzleTM.GetRotation().GetForwardVector();
+
+    FVector DirFromMuzzle = AimPoint - MuzzleLoc;
     if (!DirFromMuzzle.Normalize())
         return;
 
-
     constexpr float MaxAngleDeg = 89.0f;
-    const float CosThreshhold = FMath::Cos(FMath::DegreesToRadians(MaxAngleDeg));
-    const float CosAngle = FVector::DotProduct(MuzzleForward, DirFromMuzzle);
-    if (CosAngle <= CosThreshhold)
+    const float cosThr = FMath::Cos(FMath::DegreesToRadians(MaxAngleDeg));
+    if (FVector::DotProduct(MuzzleFwd, DirFromMuzzle) <= cosThr)
         return;
 
-    const FVector ShotStart = MuzzleLocation;
+    const FVector ShotStart = MuzzleLoc;
     const FVector ShotEnd = ShotStart + DirFromMuzzle * TraceMaxDistance;
 
     FCollisionQueryParams ShotParams(SCENE_QUERY_STAT(Weapon_ShotTrace), false);
+    ShotParams.AddIgnoredActor(GetOwner());
     ShotParams.AddIgnoredActor(this);
-    ShotParams.AddIgnoredActor(OwnerCharacter);
 
     FHitResult ShotHit;
     World->LineTraceSingleByChannel(ShotHit, ShotStart, ShotEnd, ECollisionChannel::ECC_Visibility, ShotParams);
@@ -92,6 +112,7 @@ void ASTUBaseWeaponActor::MakeShot()
     {
         DrawDebugLine(World, ShotStart, ShotHit.ImpactPoint, FColor::Red, false, 3.0f, 0, 3.0f);
         DrawDebugSphere(World, ShotHit.ImpactPoint, 10.0f, 24, FColor::Red, false, 5.0f);
+        // Apply damage here...
     }
     else
     {
