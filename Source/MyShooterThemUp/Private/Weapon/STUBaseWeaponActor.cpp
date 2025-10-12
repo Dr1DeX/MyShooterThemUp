@@ -6,6 +6,7 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
+#include <Kismet/GameplayStatics.h>
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseWeapon, All, All);
 
@@ -112,10 +113,40 @@ void ASTUBaseWeaponActor::MakeHit(UWorld* World, const FVector& AimPoint)
     {
         DrawDebugLine(World, ShotStart, ShotHit.ImpactPoint, FColor::Red, false, 3.0f, 0, 3.0f);
         DrawDebugSphere(World, ShotHit.ImpactPoint, 10.0f, 24, FColor::Red, false, 5.0f);
-        // Apply damage here...
+
+        MakeDamage(ShotHit, DirFromMuzzle);
     }
     else
     {
         DrawDebugLine(World, ShotStart, ShotEnd, FColor::Red, false, 3.0f, 0, 3.0f);
     }
+}
+
+void ASTUBaseWeaponActor::MakeDamage(FHitResult ShotHit, FVector DirFromMuzzle)
+{
+    float ActualDamage = BaseDamage;
+
+    if (ShotHit.BoneName != NAME_None)
+    {
+        const FString Bone = ShotHit.BoneName.ToString().ToLower();
+        if (Bone.Contains(TEXT("head")))
+        {
+            ActualDamage *= HeadshotMultiplier;
+        }
+    }
+
+    AController* InstigatorController = nullptr;
+    if (const auto* OwnerChar = Cast<ACharacter>(GetOwner()))
+    {
+        InstigatorController = OwnerChar->GetController();
+    }
+
+    UGameplayStatics::ApplyPointDamage(ShotHit.GetActor(), // Target
+        ActualDamage,                                      // Damage
+        DirFromMuzzle,                                     // Shot direction
+        ShotHit,                                           // Detail Hit
+        InstigatorController,                              // Who apply to damage
+        this,                                              // Damage Causer(weapon)
+        DamageType                                         // Damage Type
+    );
 }

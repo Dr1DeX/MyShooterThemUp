@@ -52,12 +52,11 @@ private:
     void OnTakeAnyDamage(
         AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
-    /** Один шаг автохила */
     void HealTick();
 
-    /** Запустить таймер автохила с задержкой */
     void StartAutoHeal();
 
-    /** Остановить автохил */
     void StopAutoHeal();
+
+    void ApplyDamage(float Damage, AController*);
 };
