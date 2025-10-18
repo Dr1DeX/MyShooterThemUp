@@ -25,11 +25,15 @@ void ASTUBaseWeaponActor::BeginPlay()
     check(WeaponMesh);
 }
 
-void ASTUBaseWeaponActor::Fire()
+void ASTUBaseWeaponActor::StartFire()
 {
-    UE_LOG(LogBaseWeapon, Warning, TEXT("Fire!"));
-
     MakeShot();
+    GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &ASTUBaseWeaponActor::MakeShot, TimeBetweenShots, true);
+}
+
+void ASTUBaseWeaponActor::StopFire()
+{
+    GetWorldTimerManager().ClearTimer(ShotTimerHandle);
 }
 
 void ASTUBaseWeaponActor::MakeShot()
@@ -80,7 +84,9 @@ bool ASTUBaseWeaponActor::GetTraceData(FVector& CameraTraceStart, FVector& Camer
         return false;
 
     CameraTraceStart = ViewLocation;
-    CameraTraceEnd = CameraTraceStart + ViewRotation.Vector() * TraceMaxDistance;
+    const auto HalfRad = FMath::DegreesToRadians(BulletSpread);
+    const FVector ShootDirection = FMath::VRandCone(ViewRotation.Vector(), HalfRad);
+    CameraTraceEnd = CameraTraceStart + ShootDirection * TraceMaxDistance;
     return true;
 }
 

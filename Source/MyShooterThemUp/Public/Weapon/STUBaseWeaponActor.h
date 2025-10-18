@@ -16,7 +16,8 @@ class MYSHOOTERTHEMUP_API ASTUBaseWeaponActor : public AActor
 public:
     ASTUBaseWeaponActor();
 
-    virtual void Fire();
+    virtual void StartFire();
+    virtual void StopFire();
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components | Weapon")
@@ -37,6 +38,12 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components | Weapon |Damage")
     TSubclassOf<UDamageType> DamageType = UDamageType::StaticClass();
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    float TimeBetweenShots = 0.1f;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    float BulletSpread = 1.5f;
+
     virtual void BeginPlay() override;
 
     void MakeShot();
@@ -49,4 +56,7 @@ protected:
     void MakeHit(UWorld* World, const FVector& AimPoint);
 
     void MakeDamage(FHitResult ShotHit, FVector DirFromMuzzle);
+
+private:
+    FTimerHandle ShotTimerHandle;
 };
