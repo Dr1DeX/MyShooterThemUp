@@ -27,34 +27,14 @@ void ASTUBaseWeaponActor::BeginPlay()
 
 void ASTUBaseWeaponActor::StartFire()
 {
-    MakeShot();
-    GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &ASTUBaseWeaponActor::MakeShot, TimeBetweenShots, true);
 }
 
 void ASTUBaseWeaponActor::StopFire()
 {
-    GetWorldTimerManager().ClearTimer(ShotTimerHandle);
 }
 
 void ASTUBaseWeaponActor::MakeShot()
 {
-    UWorld* World = GetWorld();
-    if (!World)
-        return;
-
-    FVector CameraStart, CameraEnd;
-    if (!GetTraceData(CameraStart, CameraEnd))
-        return;
-
-    FCollisionQueryParams CameraParams(SCENE_QUERY_STAT(Weapon_AimTrace), false);
-    CameraParams.AddIgnoredActor(GetOwner());
-    CameraParams.AddIgnoredActor(this);
-
-    FHitResult CameraHit;
-    World->LineTraceSingleByChannel(CameraHit, CameraStart, CameraEnd, ECollisionChannel::ECC_Visibility, CameraParams);
-    const FVector AimPoint = CameraHit.bBlockingHit ? CameraHit.ImpactPoint : CameraEnd;
-
-    MakeHit(World, AimPoint);
 }
 
 APlayerController* ASTUBaseWeaponActor::GetPlayerController() const
@@ -84,8 +64,7 @@ bool ASTUBaseWeaponActor::GetTraceData(FVector& CameraTraceStart, FVector& Camer
         return false;
 
     CameraTraceStart = ViewLocation;
-    const auto HalfRad = FMath::DegreesToRadians(BulletSpread);
-    const FVector ShootDirection = FMath::VRandCone(ViewRotation.Vector(), HalfRad);
+    const FVector ShootDirection = ViewRotation.Vector();
     CameraTraceEnd = CameraTraceStart + ShootDirection * TraceMaxDistance;
     return true;
 }
