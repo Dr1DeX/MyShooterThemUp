@@ -8,6 +8,23 @@
 
 class USkeletalMeshComponent;
 
+USTRUCT()
+struct FShotTraceResult
+{
+    GENERATED_BODY()
+
+    bool bHit = false;
+
+    FVector MuzzleStart = FVector::ZeroVector;
+    FVector MuzzleEnd = FVector::ZeroVector;
+
+    FVector DirFromMuzzle = FVector::ForwardVector;
+
+    FVector AimPoint = FVector::ZeroVector;
+
+    FHitResult Hit;
+};
+
 UCLASS()
 class MYSHOOTERTHEMUP_API ASTUBaseWeaponActor : public AActor
 {
@@ -47,7 +64,10 @@ protected:
 
     bool GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const;
 
-    void MakeHit(UWorld* World, const FVector& AimPoint);
+    bool MakeHit(UWorld* World, const FVector& CameraStart, const FVector& CameraEnd, FShotTraceResult& Out) const;
 
-    void MakeDamage(FHitResult ShotHit, FVector DirFromMuzzle);
+    void MakeDamage(const FHitResult& ShotHit, const FVector& DirFromMuzzle) const;
+    FVector GetDirFromMuzzle(const FVector AimPoint) const;
+    bool IsTraceMuzzleValidate(FVector DirFromMuzzle) const;
+    FTransform GetMuzzleTM() const;
 };

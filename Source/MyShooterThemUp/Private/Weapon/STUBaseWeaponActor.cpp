@@ -25,17 +25,11 @@ void ASTUBaseWeaponActor::BeginPlay()
     check(WeaponMesh);
 }
 
-void ASTUBaseWeaponActor::StartFire()
-{
-}
+void ASTUBaseWeaponActor::StartFire() {}
 
-void ASTUBaseWeaponActor::StopFire()
-{
-}
+void ASTUBaseWeaponActor::StopFire() {}
 
-void ASTUBaseWeaponActor::MakeShot()
-{
-}
+void ASTUBaseWeaponActor::MakeShot() {}
 
 APlayerController* ASTUBaseWeaponActor::GetPlayerController() const
 {
@@ -69,45 +63,44 @@ bool ASTUBaseWeaponActor::GetTraceData(FVector& CameraTraceStart, FVector& Camer
     return true;
 }
 
-void ASTUBaseWeaponActor::MakeHit(UWorld* World, const FVector& AimPoint)
+bool ASTUBaseWeaponActor::MakeHit(UWorld* World, const FVector& CameraStart, const FVector& CameraEnd, FShotTraceResult& Out) const
 {
-    const FTransform MuzzleTM = WeaponMesh->GetSocketTransform(MuzzleSocketName);
-    const FVector MuzzleLoc = MuzzleTM.GetLocation();
-    const FVector MuzzleFwd = MuzzleTM.GetRotation().GetForwardVector();
+    if (!World)
+        return false;
 
-    FVector DirFromMuzzle = AimPoint - MuzzleLoc;
-    if (!DirFromMuzzle.Normalize())
-        return;
-
-    constexpr float MaxAngleDeg = 89.0f;
-    const float cosThr = FMath::Cos(FMath::DegreesToRadians(MaxAngleDeg));
-    if (FVector::DotProduct(MuzzleFwd, DirFromMuzzle) <= cosThr)
-        return;
-
-    const FVector ShotStart = MuzzleLoc;
-    const FVector ShotEnd = ShotStart + DirFromMuzzle * TraceMaxDistance;
-
-    FCollisionQueryParams ShotParams(SCENE_QUERY_STAT(Weapon_ShotTrace), false);
-    ShotParams.AddIgnoredActor(GetOwner());
-    ShotParams.AddIgnoredActor(this);
-
-    FHitResult ShotHit;
-    World->LineTraceSingleByChannel(ShotHit, ShotStart, ShotEnd, ECollisionChannel::ECC_Visibility, ShotParams);
-
-    if (ShotHit.bBlockingHit)
+    FHitResult CameraHit;
     {
-        DrawDebugLine(World, ShotStart, ShotHit.ImpactPoint, FColor::Red, false, 3.0f, 0, 3.0f);
-        DrawDebugSphere(World, ShotHit.ImpactPoint, 10.0f, 24, FColor::Red, false, 5.0f);
+        FCollisionQueryParams Params(SCENE_QUERY_STAT(Weapon_CameraTrace), false);
+        Params.AddIgnoredActor(GetOwner());
+        Params.AddIgnoredActor(this);
 
-        MakeDamage(ShotHit, DirFromMuzzle);
+        World->LineTraceSingleByChannel(CameraHit, CameraStart, CameraEnd, ECollisionChannel::ECC_Visibility, Params);
     }
-    else
+
+    Out.AimPoint = CameraHit.bBlockingHit ? CameraHit.ImpactPoint : CameraEnd;
+
+    const FTransform MuzzleTM = GetMuzzleTM();
+    Out.MuzzleStart = MuzzleTM.GetLocation();
+
+    Out.DirFromMuzzle = Out.AimPoint - Out.MuzzleStart;
+    if (!IsTraceMuzzleValidate(Out.DirFromMuzzle))
+        return false;
+
+    Out.DirFromMuzzle.Normalize();
+    Out.MuzzleEnd = Out.MuzzleStart + Out.DirFromMuzzle * TraceMaxDistance;
     {
-        DrawDebugLine(World, ShotStart, ShotEnd, FColor::Red, false, 3.0f, 0, 3.0f);
+        FCollisionQueryParams Params(SCENE_QUERY_STAT(Weapon_MuzzleTrace), false);
+        Params.AddIgnoredActor(GetOwner());
+        Params.AddIgnoredActor(this);
+
+        World->LineTraceSingleByChannel(Out.Hit, Out.MuzzleStart, Out.MuzzleEnd, ECollisionChannel::ECC_Visibility, Params);
     }
+
+    Out.bHit = Out.Hit.bBlockingHit;
+    return true;
 }
 
-void ASTUBaseWeaponActor::MakeDamage(FHitResult ShotHit, FVector DirFromMuzzle)
+void ASTUBaseWeaponActor::MakeDamage(const FHitResult& ShotHit, const FVector& DirFromMuzzle) const
 {
     float ActualDamage = BaseDamage;
 
@@ -130,8 +123,31 @@ void ASTUBaseWeaponActor::MakeDamage(FHitResult ShotHit, FVector DirFromMuzzle)
         ActualDamage,                                      // Damage
         DirFromMuzzle,                                     // Shot direction
         ShotHit,                                           // Detail Hit
-        InstigatorController,                              // Who apply to damage
-        this,                                              // Damage Causer(weapon)
+        InstigatorController,                              // Instigator
+        const_cast<ASTUBaseWeaponActor*>(this),            // Causer (weapon)
         DamageType                                         // Damage Type
     );
+}
+
+FVector ASTUBaseWeaponActor::GetDirFromMuzzle(const FVector AimPoint) const
+{
+    return AimPoint - GetMuzzleTM().GetLocation();
+}
+
+bool ASTUBaseWeaponActor::IsTraceMuzzleValidate(FVector DirFromMuzzle) const
+{
+    if (!DirFromMuzzle.Normalize())
+        return false;
+
+    const FTransform MuzzleTM = GetMuzzleTM();
+    const FVector MuzzleFwd = MuzzleTM.GetRotation().GetForwardVector();
+
+    constexpr float MaxAngleDeg = 89.0f;
+    const float CosThr = FMath::Cos(FMath::DegreesToRadians(MaxAngleDeg));
+    return FVector::DotProduct(MuzzleFwd, DirFromMuzzle) > CosThr;
+}
+
+FTransform ASTUBaseWeaponActor::GetMuzzleTM() const
+{
+    return WeaponMesh ? WeaponMesh->GetSocketTransform(MuzzleSocketName) : FTransform::Identity;
 }

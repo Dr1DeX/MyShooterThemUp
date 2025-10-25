@@ -6,12 +6,19 @@
 #include "Weapon/STUBaseWeaponActor.h"
 #include "STULauncherWeaponActor.generated.h"
 
-/**
- * 
- */
+class ASTUProjectile;
+
 UCLASS()
 class MYSHOOTERTHEMUP_API ASTULauncherWeaponActor : public ASTUBaseWeaponActor
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
+public:
+    virtual void StartFire() override;
+
+protected:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    TSubclassOf<ASTUProjectile> ProjectileClass;
+
+    virtual void MakeShot() override;
 };

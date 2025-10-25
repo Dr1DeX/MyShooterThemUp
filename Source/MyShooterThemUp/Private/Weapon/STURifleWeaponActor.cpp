@@ -25,15 +25,18 @@ void ASTURifleWeaponActor::MakeShot()
     if (!GetTraceData(CameraStart, CameraEnd))
         return;
 
-    FCollisionQueryParams CameraParams(SCENE_QUERY_STAT(Weapon_AimTrace), false);
-    CameraParams.AddIgnoredActor(GetOwner());
-    CameraParams.AddIgnoredActor(this);
+    FShotTraceResult Shot;
+    if (!MakeHit(World, CameraStart, CameraEnd, Shot))
+        return;
 
-    FHitResult CameraHit;
-    World->LineTraceSingleByChannel(CameraHit, CameraStart, CameraEnd, ECollisionChannel::ECC_Visibility, CameraParams);
-    const FVector AimPoint = CameraHit.bBlockingHit ? CameraHit.ImpactPoint : CameraEnd;
+    const FVector EndPoint = Shot.bHit ? Shot.Hit.ImpactPoint : Shot.MuzzleEnd;
+    DrawDebugLine(World, Shot.MuzzleStart, EndPoint, FColor::Red, false, 3.0f, 0, 3.0f);
 
-    MakeHit(World, AimPoint);
+    if (Shot.bHit)
+    {
+        DrawDebugSphere(World, Shot.Hit.ImpactPoint, 10.0f, 24, FColor::Red, false, 5.0f);
+        MakeDamage(Shot.Hit, Shot.DirFromMuzzle);
+    }
 }
 
 bool ASTURifleWeaponActor::GetTraceData(FVector& CameraTraceStart, FVector& CameraTraceEnd) const
