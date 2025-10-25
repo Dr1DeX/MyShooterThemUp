@@ -13,6 +13,8 @@ ASTUProjectile::ASTUProjectile()
     SetRootComponent(CollisionComponent);
 
     MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComponent");
+    MovementComponent->InitialSpeed = 2000.0f;
+    MovementComponent->ProjectileGravityScale = 0.0f;
 }
 
 void ASTUProjectile::BeginPlay()
@@ -21,4 +23,5 @@ void ASTUProjectile::BeginPlay()
 
     check(MovementComponent);
     MovementComponent->Velocity = ShotDirection * MovementComponent->InitialSpeed;
+    SetLifeSpan(5.0f);
 }
