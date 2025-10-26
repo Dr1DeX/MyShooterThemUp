@@ -6,7 +6,6 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
-#include <Kismet/GameplayStatics.h>
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseWeapon, All, All);
 
@@ -98,35 +97,6 @@ bool ASTUBaseWeaponActor::MakeHit(UWorld* World, const FVector& CameraStart, con
 
     Out.bHit = Out.Hit.bBlockingHit;
     return true;
-}
-
-void ASTUBaseWeaponActor::MakeDamage(const FHitResult& ShotHit, const FVector& DirFromMuzzle) const
-{
-    float ActualDamage = BaseDamage;
-
-    if (ShotHit.BoneName != NAME_None)
-    {
-        const FString Bone = ShotHit.BoneName.ToString().ToLower();
-        if (Bone.Contains(TEXT("head")))
-        {
-            ActualDamage *= HeadshotMultiplier;
-        }
-    }
-
-    AController* InstigatorController = nullptr;
-    if (const auto* OwnerChar = Cast<ACharacter>(GetOwner()))
-    {
-        InstigatorController = OwnerChar->GetController();
-    }
-
-    UGameplayStatics::ApplyPointDamage(ShotHit.GetActor(), // Target
-        ActualDamage,                                      // Damage
-        DirFromMuzzle,                                     // Shot direction
-        ShotHit,                                           // Detail Hit
-        InstigatorController,                              // Instigator
-        const_cast<ASTUBaseWeaponActor*>(this),            // Causer (weapon)
-        DamageType                                         // Damage Type
-    );
 }
 
 FVector ASTUBaseWeaponActor::GetDirFromMuzzle(const FVector AimPoint) const
