@@ -3,6 +3,9 @@
 #include "Weapon/STURifleWeaponActor.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
+#include <Kismet/GameplayStatics.h>
+#include "GameFramework/Character.h"
+#include "GameFramework/Controller.h"
 
 void ASTURifleWeaponActor::StartFire()
 {
@@ -51,4 +54,33 @@ bool ASTURifleWeaponActor::GetTraceData(FVector& CameraTraceStart, FVector& Came
     const FVector ShootDirection = FMath::VRandCone(ViewRotation.Vector(), HalfRad);
     CameraTraceEnd = CameraTraceStart + ShootDirection * TraceMaxDistance;
     return true;
+}
+
+void ASTURifleWeaponActor::MakeDamage(const FHitResult& ShotHit, const FVector& DirFromMuzzle)
+{
+    float ActualDamage = BaseDamage;
+
+    if (ShotHit.BoneName != NAME_None)
+    {
+        const FString Bone = ShotHit.BoneName.ToString().ToLower();
+        if (Bone.Contains(TEXT("head")))
+        {
+            ActualDamage *= HeadshotMultiplier;
+        }
+    }
+
+    AController* InstigatorController = nullptr;
+    if (const auto* OwnerChar = Cast<ACharacter>(GetOwner()))
+    {
+        InstigatorController = OwnerChar->GetController();
+    }
+
+    UGameplayStatics::ApplyPointDamage(ShotHit.GetActor(), // Target
+        ActualDamage,                                      // Damage
+        DirFromMuzzle,                                     // Shot direction
+        ShotHit,                                           // Detail Hit
+        InstigatorController,                              // Instigator
+        this,                                              // Causer (weapon)
+        DamageType                                         // Damage Type
+    );
 }

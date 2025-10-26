@@ -40,17 +40,11 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components | Weapon")
     USkeletalMeshComponent* WeaponMesh;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FName MuzzleSocketName = "MuzzleSocket";
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     float TraceMaxDistance = 1500.0f;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components | Weapon |Damage")
-    float BaseDamage = 25.0f;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components | Weapon |Damage")
-    float HeadshotMultiplier = 2.0f;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components | Weapon |Damage")
     TSubclassOf<UDamageType> DamageType = UDamageType::StaticClass();
@@ -66,7 +60,6 @@ protected:
 
     bool MakeHit(UWorld* World, const FVector& CameraStart, const FVector& CameraEnd, FShotTraceResult& Out) const;
 
-    void MakeDamage(const FHitResult& ShotHit, const FVector& DirFromMuzzle) const;
     FVector GetDirFromMuzzle(const FVector AimPoint) const;
     bool IsTraceMuzzleValidate(FVector DirFromMuzzle) const;
     FTransform GetMuzzleTM() const;
