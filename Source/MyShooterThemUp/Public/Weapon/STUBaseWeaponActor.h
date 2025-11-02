@@ -8,10 +8,26 @@
 
 class USkeletalMeshComponent;
 
+USTRUCT(BlueprintType)
+struct FAmmoData
+{
+    GENERATED_BODY()
+    
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    int32 Bullets;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon", meta = (EditCondition = "!Infinite"))
+    int32 Clips;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    bool Infinite;
+};
+
 USTRUCT()
 struct FShotTraceResult
 {
     GENERATED_BODY()
+
 
     bool bHit = false;
 
@@ -49,6 +65,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components | Weapon |Damage")
     TSubclassOf<UDamageType> DamageType = UDamageType::StaticClass();
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    FAmmoData DefaultAmmo{15, 10, false};
+    
     virtual void BeginPlay() override;
 
     virtual void MakeShot();
@@ -63,4 +82,13 @@ protected:
     FVector GetDirFromMuzzle(const FVector AimPoint) const;
     bool IsTraceMuzzleValidate(FVector DirFromMuzzle) const;
     FTransform GetMuzzleTM() const;
+
+    void DecreaseAmmo();
+    bool IsAmmoEmpty() const;
+    bool IsClipEmpty() const;
+    void ChangeClip();
+    void LogAmmo();
+
+private:
+    FAmmoData CurrentAmmo;
 };

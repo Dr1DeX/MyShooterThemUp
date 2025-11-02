@@ -12,7 +12,7 @@ void ASTULauncherWeaponActor::MakeShot()
 {
 
     UWorld* World = GetWorld();
-    if (!World)
+    if (!World || IsAmmoEmpty())
         return;
 
     FVector CameraStart, CameraEnd;
@@ -34,4 +34,5 @@ void ASTULauncherWeaponActor::MakeShot()
         Projectile->SetOwner(GetOwner());
         Projectile->FinishSpawning(SpawnTransform);
     }
+    DecreaseAmmo();
 }
