@@ -72,6 +72,7 @@ void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
     PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &USTUWeaponComponent::StartFire);
     PlayerInputComponent->BindAction("Fire", IE_Released, WeaponComponent, &USTUWeaponComponent::StopFire);
     PlayerInputComponent->BindAction("NextWeapon", IE_Released, WeaponComponent, &USTUWeaponComponent::NextWeapon);
+    PlayerInputComponent->BindAction("Reload", IE_Pressed, WeaponComponent, &USTUWeaponComponent::Reload);
 }
 
 bool ASTUBaseCharacter::IsRunn() const
@@ -84,10 +85,10 @@ float ASTUBaseCharacter::GetMovementDirection() const
     if (GetVelocity().IsZero())
         return 0.0f;
 
-    const auto VelocityNormal = GetVelocity().GetSafeNormal(); // нормаль скорости
+    const auto VelocityNormal = GetVelocity().GetSafeNormal(); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     const auto AngleBetween = FMath::Acos(
-        FVector::DotProduct(GetActorForwardVector(), VelocityNormal)); // скалярное произведение между вектором нормали и вектором движения
-    const auto CrossProduct = FVector::CrossProduct(GetActorForwardVector(), VelocityNormal); // Ортогональный вектор
+        FVector::DotProduct(GetActorForwardVector(), VelocityNormal)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    const auto CrossProduct = FVector::CrossProduct(GetActorForwardVector(), VelocityNormal); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
     const auto Degrees = FMath::RadiansToDegrees(AngleBetween);
     return CrossProduct.IsZero() ? Degrees : Degrees * FMath::Sign(CrossProduct.Z);
 }

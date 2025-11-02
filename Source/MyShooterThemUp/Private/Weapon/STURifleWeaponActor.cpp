@@ -21,12 +21,18 @@ void ASTURifleWeaponActor::StopFire()
 void ASTURifleWeaponActor::MakeShot()
 {
     UWorld* World = GetWorld();
-    if (!World)
+    if (!World || IsAmmoEmpty())
+    {
+        StopFire();
         return;
+    }
 
     FVector CameraStart, CameraEnd;
     if (!GetTraceData(CameraStart, CameraEnd))
+    {
+        StopFire();
         return;
+    }
 
     FShotTraceResult Shot;
     if (!MakeHit(World, CameraStart, CameraEnd, Shot))
@@ -40,6 +46,7 @@ void ASTURifleWeaponActor::MakeShot()
         DrawDebugSphere(World, Shot.Hit.ImpactPoint, 10.0f, 24, FColor::Red, false, 5.0f);
         MakeDamage(Shot.Hit, Shot.DirFromMuzzle);
     }
+    DecreaseAmmo();
 }
 
 bool ASTURifleWeaponActor::GetTraceData(FVector& CameraTraceStart, FVector& CameraTraceEnd) const
