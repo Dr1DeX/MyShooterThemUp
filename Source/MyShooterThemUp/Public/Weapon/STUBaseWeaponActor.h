@@ -4,42 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "STUCoreTypes.h"
 #include "STUBaseWeaponActor.generated.h"
+
+DECLARE_MULTICAST_DELEGATE(FOnClipEmptySignature);
 
 class USkeletalMeshComponent;
 
-USTRUCT(BlueprintType)
-struct FAmmoData
-{
-    GENERATED_BODY()
-    
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
-    int32 Bullets;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon", meta = (EditCondition = "!Infinite"))
-    int32 Clips;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
-    bool Infinite;
-};
-
-USTRUCT()
-struct FShotTraceResult
-{
-    GENERATED_BODY()
-
-
-    bool bHit = false;
-
-    FVector MuzzleStart = FVector::ZeroVector;
-    FVector MuzzleEnd = FVector::ZeroVector;
-
-    FVector DirFromMuzzle = FVector::ForwardVector;
-
-    FVector AimPoint = FVector::ZeroVector;
-
-    FHitResult Hit;
-};
 
 UCLASS()
 class MYSHOOTERTHEMUP_API ASTUBaseWeaponActor : public AActor
@@ -48,10 +19,23 @@ class MYSHOOTERTHEMUP_API ASTUBaseWeaponActor : public AActor
 
 public:
     ASTUBaseWeaponActor();
-
+    
+    FOnClipEmptySignature OnClipEmpty;
+    FOnAmmoChangedSignature OnAmmoChanged;
+    
     virtual void StartFire();
     virtual void StopFire();
 
+    void ChangeClip();
+    bool CanReload() const;
+
+    FWeaponUIData GetUIData() const {return UIData;}
+
+    FAmmoData GetAmmoData() const { return CurrentAmmo; }
+    int32 GetCurrentBullets() const { return CurrentAmmo.Bullets; }
+    int32 GetCurrentClips()  const { return CurrentAmmo.Clips;  }
+    bool  IsInfinite() const { return CurrentAmmo.Infinite; }
+    
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components | Weapon")
     USkeletalMeshComponent* WeaponMesh;
@@ -67,6 +51,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     FAmmoData DefaultAmmo{15, 10, false};
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+    FWeaponUIData UIData;
     
     virtual void BeginPlay() override;
 
@@ -86,7 +73,6 @@ protected:
     void DecreaseAmmo();
     bool IsAmmoEmpty() const;
     bool IsClipEmpty() const;
-    void ChangeClip();
     void LogAmmo();
 
 private:

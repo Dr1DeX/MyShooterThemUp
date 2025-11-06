@@ -3,22 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "STUBaseWeaponActor.h"
 #include "Components/ActorComponent.h"
+#include "STUCoreTypes.h"
 #include "STUWeaponComponent.generated.h"
 
 class ASTUBaseWeaponActor;
-
-USTRUCT(BlueprintType)
-struct FWeaponData
-{
-    GENERATED_BODY();
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
-    TSubclassOf<ASTUBaseWeaponActor> WeaponClass;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
-    UAnimMontage* ReloadAnimMontage;
-};
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class MYSHOOTERTHEMUP_API USTUWeaponComponent : public UActorComponent
@@ -33,6 +23,19 @@ public:
     void NextWeapon();
     void Reload();
 
+    bool GetWeaponUIData(FWeaponUIData& UIData) const;
+
+    bool GetCurrentAmmoData(FAmmoData& Out) const;
+    int32 GetCurrentBullets() const;
+    int32 GetCurrentClips() const;
+    bool  IsCurrentInfinite() const;
+
+    UPROPERTY(BlueprintAssignable, Category="Weapon|Events")
+    FOnWeaponChangedDyn OnWeaponChanged;
+
+    UPROPERTY(BlueprintAssignable, Category="Weapon|Events")
+    FOnAmmoChangedDyn OnAmmoChanged;
+    
 protected:
     virtual void BeginPlay() override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -75,22 +78,9 @@ private:
     bool CanFire() const;
     bool CanEquip() const;
     bool CanReload() const;
+    
+    void OnEmptyClip();
+    void ChangeClip();
 
-    template<typename T>
-    T* FindNotifyByClass(UAnimSequenceBase* Animation)
-    {
-        if (!Animation)
-            return nullptr;
-        
-        const auto NotifyEvents = Animation->Notifies;
-        for (auto NotifyEvent : NotifyEvents)
-        {
-            auto AnimNotify = Cast<T>(NotifyEvent.Notify);
-            if (AnimNotify)
-            {
-                return AnimNotify;
-            }
-        }
-        return nullptr;
-    }
+    void BindAmmoEvents(ASTUBaseWeaponActor* Weapon) const;
 };

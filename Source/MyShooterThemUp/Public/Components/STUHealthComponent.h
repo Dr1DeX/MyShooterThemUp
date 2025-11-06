@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "STUCoreTypes.h"
 #include "STUHealthComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnDeath)
@@ -22,6 +23,9 @@ public:
     UFUNCTION(BlueprintCallable)
     bool IsDead() const { return Health <= 0.0f; }
 
+    UFUNCTION(BlueprintCallable, Category = "Health")
+    float GetHealthPercent() const {return Health / MaxHealth;}
+    
     FOnDeath OnDeath;
     FOnHealthChanged OnHealthChanged;
 
