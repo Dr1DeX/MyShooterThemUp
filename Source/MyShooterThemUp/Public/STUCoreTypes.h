@@ -71,8 +71,3 @@ struct FWeaponUIData
 // health
 DECLARE_MULTICAST_DELEGATE(FOnDeath)
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float)
-
-// weapon events
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnAmmoChangedSignature, const FAmmoData&);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChangedDyn, ASTUBaseWeaponActor*, NewWeapon);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAmmoChangedDyn, const FAmmoData&, NewAmmo);

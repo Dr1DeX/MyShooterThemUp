@@ -26,15 +26,7 @@ public:
     bool GetWeaponUIData(FWeaponUIData& UIData) const;
 
     bool GetCurrentAmmoData(FAmmoData& Out) const;
-    int32 GetCurrentBullets() const;
-    int32 GetCurrentClips() const;
-    bool  IsCurrentInfinite() const;
 
-    UPROPERTY(BlueprintAssignable, Category="Weapon|Events")
-    FOnWeaponChangedDyn OnWeaponChanged;
-
-    UPROPERTY(BlueprintAssignable, Category="Weapon|Events")
-    FOnAmmoChangedDyn OnAmmoChanged;
     
 protected:
     virtual void BeginPlay() override;
@@ -82,5 +74,4 @@ private:
     void OnEmptyClip();
     void ChangeClip();
 
-    void BindAmmoEvents(ASTUBaseWeaponActor* Weapon) const;
 };

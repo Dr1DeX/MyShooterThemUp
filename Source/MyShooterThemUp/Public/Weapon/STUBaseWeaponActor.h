@@ -21,7 +21,6 @@ public:
     ASTUBaseWeaponActor();
     
     FOnClipEmptySignature OnClipEmpty;
-    FOnAmmoChangedSignature OnAmmoChanged;
     
     virtual void StartFire();
     virtual void StopFire();
@@ -30,11 +29,7 @@ public:
     bool CanReload() const;
 
     FWeaponUIData GetUIData() const {return UIData;}
-
     FAmmoData GetAmmoData() const { return CurrentAmmo; }
-    int32 GetCurrentBullets() const { return CurrentAmmo.Bullets; }
-    int32 GetCurrentClips()  const { return CurrentAmmo.Clips;  }
-    bool  IsInfinite() const { return CurrentAmmo.Infinite; }
     
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components | Weapon")

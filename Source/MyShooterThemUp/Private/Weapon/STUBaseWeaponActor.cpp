@@ -25,7 +25,6 @@ void ASTUBaseWeaponActor::BeginPlay()
     checkf(DefaultAmmo.Bullets > 0, TEXT("Bullets count couldn't be less or equal zero"));
     checkf(DefaultAmmo.Clips > 0, TEXT("Clips count couldn't be less or equal zero"));
     CurrentAmmo = DefaultAmmo;
-    OnAmmoChanged.Broadcast(CurrentAmmo);
 }
 
 void ASTUBaseWeaponActor::StartFire() {}
@@ -135,8 +134,6 @@ void ASTUBaseWeaponActor::DecreaseAmmo()
     }
     
     CurrentAmmo.Bullets--;
-    LogAmmo();
-    OnAmmoChanged.Broadcast(CurrentAmmo);
 
     if(IsClipEmpty() && !IsAmmoEmpty())
     {
@@ -168,8 +165,6 @@ void ASTUBaseWeaponActor::ChangeClip()
     }
     CurrentAmmo.Bullets = DefaultAmmo.Bullets;
     UE_LOG(LogBaseWeapon, Display, TEXT("------- Change clip -------"));
-    
-    OnAmmoChanged.Broadcast(CurrentAmmo); 
 }
 
 bool ASTUBaseWeaponActor::CanReload() const

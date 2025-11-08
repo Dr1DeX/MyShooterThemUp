@@ -54,8 +54,6 @@ void USTUWeaponComponent::SpawnWeapons()
 
         Weapon->OnClipEmpty.AddUObject(this, &USTUWeaponComponent::OnEmptyClip);
         
-        BindAmmoEvents(Weapon);
-        
         Weapon->SetOwner(Character);
         Weapons.Add(Weapon);
 
@@ -101,9 +99,6 @@ void USTUWeaponComponent::EquipWeapon(int32 WeaponIndex)
     AttachWeaponToSocket(CurrentWeapon, Character->GetMesh(), WeaponEquipSocketName);
     EquipAnimInProgress = true;
     PlayAnimMontage(EquipAnimMontage);
-
-    OnWeaponChanged.Broadcast(CurrentWeapon);
-    OnAmmoChanged.Broadcast(CurrentWeapon->GetAmmoData());
 }
 
 void USTUWeaponComponent::PlayAnimMontage(UAnimMontage* Animation)
@@ -190,15 +185,6 @@ void USTUWeaponComponent::ChangeClip()
     PlayAnimMontage(CurrentReloadAnimMontage);
 }
 
-void USTUWeaponComponent::BindAmmoEvents(ASTUBaseWeaponActor* Weapon) const
-{
-    if (!Weapon) return;
-
-    Weapon->OnAmmoChanged.AddLambda([this](const FAmmoData& NewAmmo)
-    {
-        OnAmmoChanged.Broadcast(NewAmmo);
-    });
-}
 
 void USTUWeaponComponent::StartFire()
 {
@@ -245,19 +231,4 @@ bool USTUWeaponComponent::GetCurrentAmmoData(FAmmoData& Out) const
         return false;
     Out = CurrentWeapon->GetAmmoData();
     return true;
-}
-
-int32 USTUWeaponComponent::GetCurrentBullets() const
-{
-    return CurrentWeapon ? CurrentWeapon->GetCurrentBullets() : 0;
-}
-
-int32 USTUWeaponComponent::GetCurrentClips() const
-{
-    return CurrentWeapon ? CurrentWeapon->GetCurrentClips() : 0;
-}
-
-bool USTUWeaponComponent::IsCurrentInfinite() const
-{
-    return CurrentWeapon ? CurrentWeapon->IsInfinite() : false;
 }
