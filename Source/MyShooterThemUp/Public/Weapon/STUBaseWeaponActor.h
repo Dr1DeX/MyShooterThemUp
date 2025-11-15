@@ -7,7 +7,6 @@
 #include "STUCoreTypes.h"
 #include "STUBaseWeaponActor.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnClipEmptySignature);
 
 class USkeletalMeshComponent;
 
@@ -19,7 +18,7 @@ class MYSHOOTERTHEMUP_API ASTUBaseWeaponActor : public AActor
 
 public:
     ASTUBaseWeaponActor();
-    
+
     FOnClipEmptySignature OnClipEmpty;
     
     virtual void StartFire();
@@ -30,6 +29,8 @@ public:
 
     FWeaponUIData GetUIData() const {return UIData;}
     FAmmoData GetAmmoData() const { return CurrentAmmo; }
+
+    bool TryToAddAmmo(int32 ClipsAmount);
     
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components | Weapon")
@@ -66,9 +67,11 @@ protected:
     FTransform GetMuzzleTM() const;
 
     void DecreaseAmmo();
+    void LogAmmo();
     bool IsAmmoEmpty() const;
     bool IsClipEmpty() const;
-    void LogAmmo();
+    bool IsAmmoFull() const;
+    
 
 private:
     FAmmoData CurrentAmmo;
