@@ -10,6 +10,22 @@ USTUHealthComponent::USTUHealthComponent()
     PrimaryComponentTick.bCanEverTick = false;
 }
 
+bool USTUHealthComponent::TryToHealth(int32 HealthAmount)
+{
+    if (HealthAmount <= 0.0f || IsDead() || FMath::IsNearlyEqual(Health, MaxHealth))
+        return false;
+
+    const float OldHealth = Health;
+    Health = FMath::Clamp(Health + HealthAmount, 0.0f, MaxHealth);
+
+    if (!FMath::IsNearlyEqual(Health, OldHealth))
+    {
+        OnHealthChanged.Broadcast(Health);
+    }
+
+    return !FMath::IsNearlyEqual(Health, OldHealth);
+}
+
 void USTUHealthComponent::BeginPlay()
 {
     Super::BeginPlay();

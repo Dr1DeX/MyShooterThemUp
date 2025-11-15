@@ -18,7 +18,8 @@ public class MyShooterThemUp : ModuleRules
             "MyShooterThemUp/Public/Dev",
             "MyShooterThemUp/Public/Weapon",
             "MyShooterThemUp/Public/UI",
-            "MyShooterThemUp/Public/Animations"
+            "MyShooterThemUp/Public/Animations",
+            "MyShooterThemUp/Public/Pickups"
         });
 
         // Uncomment if you are using Slate UI
