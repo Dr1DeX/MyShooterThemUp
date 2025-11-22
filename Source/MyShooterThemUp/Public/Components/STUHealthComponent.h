@@ -7,8 +7,8 @@
 #include "STUCoreTypes.h"
 #include "STUHealthComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnDeath)
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float)
+
+class UCameraShakeBase;
 
     UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent)) class MYSHOOTERTHEMUP_API USTUHealthComponent
     : public UActorComponent
@@ -30,6 +30,7 @@ public:
     FOnHealthChanged OnHealthChanged;
 
     bool TryToHealth(int32 HealthAmount);
+    bool IsHealthFull() const;
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health", meta = (ClampMin = "0.0", ClampMax = "1000.0"))
@@ -47,6 +48,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health|AutoHeal", meta = (ClampMin = "0.0"))
     float HealModifier = 1.0f;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    TSubclassOf<UCameraShakeBase> CameraShake;
+    
     virtual void BeginPlay() override;
 
 private:
@@ -63,6 +67,10 @@ private:
     void StartAutoHeal();
 
     void StopAutoHeal();
-
+        void PlayCameraShake();
+        
     void ApplyDamage(float Damage, AController*);
+
+    void SetHealth(float NewHealth);
+    void HealUpdate();
 };

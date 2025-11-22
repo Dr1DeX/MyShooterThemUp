@@ -8,7 +8,15 @@ public class MyShooterThemUp : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+        PublicDependencyModuleNames.AddRange(new string[]
+        {
+            "Core", 
+            "CoreUObject", 
+            "Engine", 
+            "InputCore",
+            "Niagara",
+            "PhysicsCore"
+        });
 
         PrivateDependencyModuleNames.AddRange(new string[] { });
 
@@ -19,7 +27,8 @@ public class MyShooterThemUp : ModuleRules
             "MyShooterThemUp/Public/Weapon",
             "MyShooterThemUp/Public/UI",
             "MyShooterThemUp/Public/Animations",
-            "MyShooterThemUp/Public/Pickups"
+            "MyShooterThemUp/Public/Pickups",
+            "MyShooterThemUp/Public/Weapon/Components",
         });
 
         // Uncomment if you are using Slate UI

@@ -6,6 +6,12 @@
 #include <Kismet/GameplayStatics.h>
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
+#include "Weapon/Components/STUWeaponFXComponent.h"
+
+ASTURifleWeaponActor::ASTURifleWeaponActor()
+{
+    WeaponFXComponent = CreateDefaultSubobject<USTUWeaponFXComponent>("WeaponFXComponent");
+}
 
 void ASTURifleWeaponActor::StartFire()
 {
@@ -39,12 +45,13 @@ void ASTURifleWeaponActor::MakeShot()
         return;
 
     const FVector EndPoint = Shot.bHit ? Shot.Hit.ImpactPoint : Shot.MuzzleEnd;
-    DrawDebugLine(World, Shot.MuzzleStart, EndPoint, FColor::Red, false, 3.0f, 0, 3.0f);
+    //DrawDebugLine(World, Shot.MuzzleStart, EndPoint, FColor::Red, false, 3.0f, 0, 3.0f);
 
     if (Shot.bHit)
     {
-        DrawDebugSphere(World, Shot.Hit.ImpactPoint, 10.0f, 24, FColor::Red, false, 5.0f);
+        //DrawDebugSphere(World, Shot.Hit.ImpactPoint, 10.0f, 24, FColor::Red, false, 5.0f);
         MakeDamage(Shot.Hit, Shot.DirFromMuzzle);
+        WeaponFXComponent->PlayImpactFX(Shot.Hit);
     }
     DecreaseAmmo();
 }
@@ -61,6 +68,12 @@ bool ASTURifleWeaponActor::GetTraceData(FVector& CameraTraceStart, FVector& Came
     const FVector ShootDirection = FMath::VRandCone(ViewRotation.Vector(), HalfRad);
     CameraTraceEnd = CameraTraceStart + ShootDirection * TraceMaxDistance;
     return true;
+}
+
+void ASTURifleWeaponActor::BeginPlay()
+{
+    Super::BeginPlay();
+    check(WeaponFXComponent);
 }
 
 void ASTURifleWeaponActor::MakeDamage(const FHitResult& ShotHit, const FVector& DirFromMuzzle)

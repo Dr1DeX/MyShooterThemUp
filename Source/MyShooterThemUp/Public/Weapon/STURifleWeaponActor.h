@@ -6,18 +6,22 @@
 #include "Weapon/STUBaseWeaponActor.h"
 #include "STURifleWeaponActor.generated.h"
 
+class USTUWeaponFXComponent;
+
 UCLASS()
 class MYSHOOTERTHEMUP_API ASTURifleWeaponActor : public ASTUBaseWeaponActor
 {
     GENERATED_BODY()
 
 public:
+    ASTURifleWeaponActor();
     virtual void StartFire() override;
     virtual void StopFire() override;
 
 protected:
     virtual void MakeShot() override;
     virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const override;
+    virtual void BeginPlay() override;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     float TimeBetweenShots = 0.1f;
@@ -30,6 +34,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     float HeadshotMultiplier = 2.0f;
+
+    UPROPERTY(VisibleAnywhere, Category = "VFX")
+    USTUWeaponFXComponent* WeaponFXComponent;
 
 private:
     FTimerHandle ShotTimerHandle;

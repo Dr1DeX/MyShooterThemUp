@@ -75,10 +75,10 @@ bool ASTUBaseWeaponActor::MakeHit(UWorld* World, const FVector& CameraStart, con
         FCollisionQueryParams Params(SCENE_QUERY_STAT(Weapon_CameraTrace), false);
         Params.AddIgnoredActor(GetOwner());
         Params.AddIgnoredActor(this);
-
+        Params.bReturnPhysicalMaterial = true;
+        
         World->LineTraceSingleByChannel(CameraHit, CameraStart, CameraEnd, ECollisionChannel::ECC_Visibility, Params);
     }
-
     Out.AimPoint = CameraHit.bBlockingHit ? CameraHit.ImpactPoint : CameraEnd;
 
     const FTransform MuzzleTM = GetMuzzleTM();
