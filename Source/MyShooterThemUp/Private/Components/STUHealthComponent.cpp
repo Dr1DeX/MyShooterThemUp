@@ -2,6 +2,10 @@
 
 #include "Components/STUHealthComponent.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/Pawn.h"
+#include "GameFramework/Controller.h"
+#include "Camera/CameraShakeBase.h"
+
 
 DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All);
 
@@ -12,18 +16,34 @@ USTUHealthComponent::USTUHealthComponent()
 
 bool USTUHealthComponent::TryToHealth(int32 HealthAmount)
 {
-    if (HealthAmount <= 0.0f || IsDead() || FMath::IsNearlyEqual(Health, MaxHealth))
-        return false;
+    if (IsDead() || IsHealthFull()) return false;
 
-    const float OldHealth = Health;
-    Health = FMath::Clamp(Health + HealthAmount, 0.0f, MaxHealth);
+    SetHealth(Health + HealthAmount);
+    return true;
+}
 
-    if (!FMath::IsNearlyEqual(Health, OldHealth))
+void USTUHealthComponent::HealUpdate()
+{
+    SetHealth(Health + HealModifier);
+
+    if (IsHealthFull() && GetWorld())
     {
-        OnHealthChanged.Broadcast(Health);
+        GetWorld()->GetTimerManager().ClearTimer(HealTimerHandle);
     }
+}
 
-    return !FMath::IsNearlyEqual(Health, OldHealth);
+bool USTUHealthComponent::IsHealthFull() const
+{
+    return FMath::IsNearlyEqual(Health, MaxHealth);
+}
+
+void USTUHealthComponent::SetHealth(float NewHealth)
+{
+    const auto NextHealth = FMath::Clamp(NewHealth, 0.0f, MaxHealth);
+    const auto HealthDelta = NextHealth - Health;
+
+    Health = NextHealth;
+    OnHealthChanged.Broadcast(Health, HealthDelta);
 }
 
 void USTUHealthComponent::BeginPlay()
@@ -32,8 +52,7 @@ void USTUHealthComponent::BeginPlay()
 
     check(MaxHealth > 0);
     
-    Health = MaxHealth;
-    OnHealthChanged.Broadcast(Health);
+    SetHealth(MaxHealth);
 
     AActor* ComponentOwner = GetOwner();
 
@@ -60,18 +79,10 @@ void USTUHealthComponent::HealTick()
         return;
     }
 
-    const float Amount = HealModifier;
+    const float NewHealth = Health + HealModifier;
+    SetHealth(NewHealth);
 
-    const float OldHealth = Health;
-
-    Health = FMath::Clamp(Health + Amount, 0.0f, MaxHealth);
-
-    if (!FMath::IsNearlyEqual(Health, OldHealth))
-    {
-        OnHealthChanged.Broadcast(Health);
-    }
-
-    if (FMath::IsNearlyEqual(Health, MaxHealth))
+    if (IsHealthFull())
     {
         StopAutoHeal();
     }
@@ -96,18 +107,26 @@ void USTUHealthComponent::StopAutoHeal()
     }
 }
 
+void USTUHealthComponent::PlayCameraShake()
+{
+    if (IsDead()) return;
+    
+    const auto Player = Cast<APawn>(GetOwner());
+    if (!Player) return;
+
+    const auto Controller = Player->GetController<APlayerController>();
+    if (!Controller || !Controller->PlayerCameraManager) return;
+
+    Controller->PlayerCameraManager->StartCameraShake(CameraShake);
+}
+
 void USTUHealthComponent::ApplyDamage(float Damage, AController*)
 {
     if (Damage <= 0.f || IsDead())
         return;
 
-    const float OldHealth = Health;
-    Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
-
-    if (!FMath::IsNearlyEqual(Health, OldHealth))
-    {
-        OnHealthChanged.Broadcast(Health);
-    }
+    const float NewHealth = Health - Damage;
+    SetHealth(NewHealth);
 
     if (IsDead())
     {
@@ -121,4 +140,5 @@ void USTUHealthComponent::ApplyDamage(float Damage, AController*)
     {
         StartAutoHeal();
     }
+    PlayCameraShake();
 }
