@@ -9,7 +9,8 @@
 
 
 class USkeletalMeshComponent;
-
+class UNiagaraSystem;
+class UNiagaraComponent;
 
 UCLASS()
 class MYSHOOTERTHEMUP_API ASTUBaseWeaponActor : public AActor
@@ -50,6 +51,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
     FWeaponUIData UIData;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    UNiagaraSystem* MuzzleFX;
     
     virtual void BeginPlay() override;
 
@@ -71,7 +75,9 @@ protected:
     bool IsAmmoEmpty() const;
     bool IsClipEmpty() const;
     bool IsAmmoFull() const;
-    
+
+
+    UNiagaraComponent* SpawnMuzzleFX();
 
 private:
     FAmmoData CurrentAmmo;

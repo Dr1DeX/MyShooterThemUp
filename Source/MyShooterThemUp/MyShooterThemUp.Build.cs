@@ -15,7 +15,9 @@ public class MyShooterThemUp : ModuleRules
             "Engine", 
             "InputCore",
             "Niagara",
-            "PhysicsCore"
+            "PhysicsCore",
+            "GamePlayTasks",
+            "NavigationSystem",
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] { });
@@ -29,6 +31,9 @@ public class MyShooterThemUp : ModuleRules
             "MyShooterThemUp/Public/Animations",
             "MyShooterThemUp/Public/Pickups",
             "MyShooterThemUp/Public/Weapon/Components",
+            "MyShooterThemUp/Public/AI",
+            "MyShooterThemUp/Public/AI/Tasks",
+            "MyShooterThemUp/Public/AI/Services"
         });
 
         // Uncomment if you are using Slate UI
