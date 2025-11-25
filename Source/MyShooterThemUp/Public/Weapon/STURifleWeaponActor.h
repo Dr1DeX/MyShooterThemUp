@@ -7,6 +7,8 @@
 #include "STURifleWeaponActor.generated.h"
 
 class USTUWeaponFXComponent;
+class UNiagaraComponent;
+class UNiagaraSystem;
 
 UCLASS()
 class MYSHOOTERTHEMUP_API ASTURifleWeaponActor : public ASTUBaseWeaponActor
@@ -38,8 +40,20 @@ protected:
     UPROPERTY(VisibleAnywhere, Category = "VFX")
     USTUWeaponFXComponent* WeaponFXComponent;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    UNiagaraSystem* TraceFX;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    FName TraceTargetName = "TraceTarget";
+
 private:
     FTimerHandle ShotTimerHandle;
 
+    UPROPERTY()
+    UNiagaraComponent* MuzzleFXComponent;
+    
     void MakeDamage(const FHitResult& ShotHit, const FVector& DirFromMuzzle);
+    void InitializeMuzzleFX();
+    void SetMuzzleFXVisibility(bool Visible);
+    void SpawnTraceFX(const FVector& TraceStart, const FVector& TraceEnd);
 };
