@@ -18,9 +18,9 @@ class MYSHOOTERTHEMUP_API USTUWeaponComponent : public UActorComponent
 public:
     USTUWeaponComponent();
 
-    void StartFire();
+    virtual void StartFire();
     void StopFire();
-    void NextWeapon();
+    virtual void NextWeapon();
     void Reload();
 
     bool GetWeaponUIData(FWeaponUIData& UIData) const;
@@ -46,31 +46,34 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Animation")
     UAnimMontage* EquipAnimMontage;
 
-private:
     UPROPERTY()
     ASTUBaseWeaponActor* CurrentWeapon = nullptr;
 
     UPROPERTY()
-    UAnimMontage* CurrentReloadAnimMontage = nullptr;
-
-    UPROPERTY()
     TArray<ASTUBaseWeaponActor*> Weapons;
 
+    bool CanFire() const;
+    bool CanEquip() const;
+
+    void EquipWeapon(int32 WeaponIndex);
+
     int32 CurrentWeaponIndex = 0;
+
+private:
+    UPROPERTY()
+    UAnimMontage* CurrentReloadAnimMontage = nullptr;
+    
     bool EquipAnimInProgress = false;
     bool ReloadAnimInProgress = false;
 
     void SpawnWeapons();
     void AttachWeaponToSocket(ASTUBaseWeaponActor* Weapon, USceneComponent* SceneComponent, const FName& SocketName);
-    void EquipWeapon(int32 WeaponIndex);
 
     void PlayAnimMontage(UAnimMontage* Animation);
     void InitAnimations();
     void OnEquipFinished(USkeletalMeshComponent* MeshComponent);
     void OnReloadFinished(USkeletalMeshComponent* MeshComponent);
-
-    bool CanFire() const;
-    bool CanEquip() const;
+    
     bool CanReload() const;
     
     void OnClipEmpty(ASTUBaseWeaponActor* AmmoEmptyWeapon);
