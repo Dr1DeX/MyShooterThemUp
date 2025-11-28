@@ -27,6 +27,7 @@ public:
 
     void ChangeClip();
     bool CanReload() const;
+    bool IsAmmoEmpty() const;
 
     FWeaponUIData GetUIData() const {return UIData;}
     FAmmoData GetAmmoData() const { return CurrentAmmo; }
@@ -72,7 +73,6 @@ protected:
 
     void DecreaseAmmo();
     void LogAmmo();
-    bool IsAmmoEmpty() const;
     bool IsClipEmpty() const;
     bool IsAmmoFull() const;
 
