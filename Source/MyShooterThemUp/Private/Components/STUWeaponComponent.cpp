@@ -260,3 +260,16 @@ bool USTUWeaponComponent::TryToAddAmmo(TSubclassOf<ASTUBaseWeaponActor> WeaponTy
     }
     return false;
 }
+
+bool USTUWeaponComponent::NeedAmmo(TSubclassOf<ASTUBaseWeaponActor> WeaponType)
+{
+    for (const auto Weapon : Weapons)
+    {
+        if (Weapon && Weapon->IsA(WeaponType))
+        {
+            UE_LOG(LogWeaponComponent, Warning, TEXT("Try need ammo %s"), *GetNameSafe(WeaponType))
+            return !Weapon->IsAmmoFull();
+        }
+    }
+    return false;
+}
