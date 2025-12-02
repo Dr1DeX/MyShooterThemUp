@@ -86,10 +86,10 @@ float ASTUBaseCharacter::GetMovementDirection() const
     if (GetVelocity().IsZero())
         return 0.0f;
 
-    const auto VelocityNormal = GetVelocity().GetSafeNormal(); // ������� ��������
+    const auto VelocityNormal = GetVelocity().GetSafeNormal();
     const auto AngleBetween = FMath::Acos(
-        FVector::DotProduct(GetActorForwardVector(), VelocityNormal)); // ��������� ������������ ����� �������� ������� � �������� ��������
-    const auto CrossProduct = FVector::CrossProduct(GetActorForwardVector(), VelocityNormal); // ������������� ������
+        FVector::DotProduct(GetActorForwardVector(), VelocityNormal));
+    const auto CrossProduct = FVector::CrossProduct(GetActorForwardVector(), VelocityNormal); 
     const auto Degrees = FMath::RadiansToDegrees(AngleBetween);
     return CrossProduct.IsZero() ? Degrees : Degrees * FMath::Sign(CrossProduct.Z);
 }
@@ -140,6 +140,15 @@ void ASTUBaseCharacter::OnDeath()
 
     GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     GetMesh()->SetSimulatePhysics(true);
+}
+
+void ASTUBaseCharacter::SetPlayerColor(const FLinearColor& Color)
+{
+    const auto MaterialInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(0);
+    if(!MaterialInst)
+        return;
+
+    MaterialInst->SetVectorParameterValue(MaterialColorName, Color);
 }
 
 void ASTUBaseCharacter::OnHealthChanged(float Health, float HealthDelta)
