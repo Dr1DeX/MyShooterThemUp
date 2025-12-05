@@ -69,8 +69,9 @@ private:
     void StopAutoHeal();
         void PlayCameraShake();
         
-    void ApplyDamage(float Damage, AController*);
+    void ApplyDamage(float Damage, AController* InstigatedBy);
 
     void SetHealth(float NewHealth);
     void HealUpdate();
+        void Killed(AController* KillerController);
 };
