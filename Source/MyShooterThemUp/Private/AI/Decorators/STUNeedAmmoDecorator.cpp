@@ -29,6 +29,5 @@ bool USTUNeedAmmoDecorator::CalculateRawConditionValue(UBehaviorTreeComponent& O
     if (!WeaponComponent)
         return false;
     const bool Result = WeaponComponent->NeedAmmo(WeaponType);
-    UE_LOG(LogNeedAmmoDecorator, Warning, TEXT("Result need decorator: %d"), Result);
     return Result;
 }
