@@ -267,7 +267,6 @@ bool USTUWeaponComponent::NeedAmmo(TSubclassOf<ASTUBaseWeaponActor> WeaponType)
     {
         if (Weapon && Weapon->IsA(WeaponType))
         {
-            UE_LOG(LogWeaponComponent, Warning, TEXT("Try need ammo %s"), *GetNameSafe(WeaponType))
             return !Weapon->IsAmmoFull();
         }
     }
