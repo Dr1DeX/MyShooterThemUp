@@ -16,7 +16,7 @@ public class MyShooterThemUp : ModuleRules
             "InputCore",
             "Niagara",
             "PhysicsCore",
-            "GamePlayTasks",
+            "GameplayTasks",
             "NavigationSystem",
         });
 
