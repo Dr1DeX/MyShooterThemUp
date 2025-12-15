@@ -7,6 +7,7 @@
 #include "STULauncherWeaponActor.generated.h"
 
 class ASTUProjectile;
+class USoundCue;
 
 UCLASS()
 class MYSHOOTERTHEMUP_API ASTULauncherWeaponActor : public ASTUBaseWeaponActor
@@ -20,5 +21,8 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     TSubclassOf<ASTUProjectile> ProjectileClass;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+    USoundCue* NoAmmoSound;
+    
     virtual void MakeShot() override;
 };
