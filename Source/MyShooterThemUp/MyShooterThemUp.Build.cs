@@ -38,6 +38,7 @@ public class MyShooterThemUp : ModuleRules
             "MyShooterThemUp/Public/AI/Decorators",
             "MyShooterThemUp/Public/Menu",
             "MyShooterThemUp/Public/Menu/UI",
+            "MyShooterThemUp/Public/Sound",
         });
 
         // Uncomment if you are using Slate UI

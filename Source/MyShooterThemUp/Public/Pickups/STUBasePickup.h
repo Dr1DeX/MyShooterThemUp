@@ -7,6 +7,7 @@
 #include "STUBasePickup.generated.h"
 
 class USphereComponent;
+class USoundCue;
 
 UCLASS()
 class MYSHOOTERTHEMUP_API ASTUBasePickup : public AActor
@@ -28,6 +29,9 @@ protected:
 public:
     virtual void Tick(float DeltaTime) override;
     bool CouldBeTaken() const;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup")
+    USoundCue* PickupSound;
 
 private:
     float RotationYaw = 0.0f;

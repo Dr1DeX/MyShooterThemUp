@@ -1,4 +1,5 @@
 #pragma once
+#include "STUHealthComponent.h"
 #include "Player/STUPlayerState.h"
 
 class STUUtils
@@ -28,4 +29,14 @@ public:
     {
         return FText::FromString(FString::FromInt(Number));
     }
+
+    static bool IsEnemyByHealthComponent(const FHitResult& Hit)
+    {
+        const auto HitActor = Hit.GetActor();
+        if(!HitActor)
+            return false;
+
+        return HitActor->FindComponentByClass<USTUHealthComponent>() != nullptr;
+    }
+    
 };
